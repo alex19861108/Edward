@@ -11,12 +11,6 @@ import (
 
 type server struct{}
 
-type MyData struct {
-	Y int32
-	X int32
-	Z int32
-}
-
 func (s *server) SearchXID(ctx context.Context, info *SearchXIDInfo) (*SearchXIDRes, error) {
 	writer.TextWriter(info)
 	return &SearchXIDRes{

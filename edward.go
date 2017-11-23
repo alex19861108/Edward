@@ -6,6 +6,8 @@ import (
 	"git-pd.megvii-inc.com/liuwei02/Edward/reader"
 	"git-pd.megvii-inc.com/liuwei02/Edward/sender"
 	"git-pd.megvii-inc.com/liuwei02/Edward/taurusrpc"
+	"git-pd.megvii-inc.com/liuwei02/Edward/transformer"
+	"log"
 	"os"
 	"os/signal"
 	"strings"
@@ -58,7 +60,11 @@ func main() {
 
 	if strings.ToLower(*t) == "loads" {
 		contents := reader.TextReader(*i)
-		//infos := transformer.Transform(contents)
+		infos := transformer.Transform(contents )
+		for _, info := range infos {
+			log.Print(info)
+		}
+
 		e := &sender.Edward{
 			Contents:     contents,
 			Address:      *address,

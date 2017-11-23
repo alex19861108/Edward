@@ -7,7 +7,7 @@ import (
 )
 
 func Transform(slice []string) []interface{} {
-	res := make([]interface{}, len(slice))
+	var res []interface{}
 	for _, content := range slice {
 		/**
 		value, ok := content.(string)
@@ -16,6 +16,7 @@ func Transform(slice []string) []interface{} {
 		}
 		*/
 		var info taurusrpc.SearchXIDInfo
+
 		err := json.Unmarshal([]byte(content), &info)
 		if err != nil {
 			log.Fatal(err)
