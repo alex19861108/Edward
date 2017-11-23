@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+option java_package = "com.megvii.nest.taurus";
+option java_outer_classname = "TaurusServiceProto";
+option java_multiple_files = true;
+
+package taurusrpc;
+
+// The Taurus service definition
+service Taurus {
+  // Search corresponding XID
+  rpc SearchXID (SearchXIDInfo) returns (SearchXIDRes) {}
+}
+
+// The request message for API SearchXID
+// As FPIndices & DeviceInfo maybe change, so give the two independent role
+message SearchXIDInfo {
+  string zid = 1;
+  ChecksumLists checksums = 2;
+  FPIndices fp = 3;
+  DeviceInfo device = 4;
+  string timestamp = 5;
+}
+
+// Checksums
+message ChecksumLists {
+  string preference_checksum = 1;
+  string setting_checksum = 2;
+  string sdcard_checksum = 3;
+}
+
+// FPIndices Fields
+message FPIndices {
+  string sys_mac = 1;
+  string sys_imei = 2;
+  string android_id = 3;
+  string sdcard_cid = 4;
+  string sys_serialno = 5;
+  string net_sim1_imsi = 6;
+  string net_sim1_iccid = 7;
+}
+
+// DeviceInfo Fields
+message DeviceInfo {
+  string sys_manufacture = 1;
+  string sys_model = 2;
+  string sys_brand = 3;
+  string sys_board = 4;
+  string sys_device = 5;
+  string sys_hardware = 6;
+  string sys_product = 7;
+  string display_resolution = 8;
+  string display_size = 9;
+  string cpu_code = 10;
+  string cpu_kernel = 11;
+  string cpu_core_number = 12;
+}
+
+
+// The response message for API SearchXID
+message SearchXIDRes {
+  string xid = 1;
+  int32 statusCode = 2;
+  int32 childStatusCode = 3;
+  bool suspicious = 4;
+}
