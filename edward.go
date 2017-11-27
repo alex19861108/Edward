@@ -6,8 +6,7 @@ import (
 	"git-pd.megvii-inc.com/liuwei02/Edward/reader"
 	"git-pd.megvii-inc.com/liuwei02/Edward/sender"
 	"git-pd.megvii-inc.com/liuwei02/Edward/taurusrpc"
-	"git-pd.megvii-inc.com/liuwei02/Edward/transformer"
-	"log"
+	"math"
 	"os"
 	"os/signal"
 	"strings"
@@ -27,7 +26,7 @@ var (
 	t       = flag.String("t", "dumps", "dumps or loads")
 	i       = flag.String("i", "input", "input file")
 	n       = flag.Int("n", 1000, "request count")
-	qps     = flag.Float64("qps", 10, "qps")
+	qps     = flag.Float64("qps", math.Inf(1), "qps")
 	threads = flag.Int("threads", 1, "threads")
 	address = flag.String("address", "localhost:"+tcp_port, "tcp client ")
 )
@@ -60,10 +59,11 @@ func main() {
 
 	if strings.ToLower(*t) == "loads" {
 		contents := reader.TextReader(*i)
-		infos := transformer.Transform(contents )
-		for _, info := range infos {
-			log.Print(info)
-		}
+
+		//infos := transformer.Transform(contents)
+		//for _, info := range infos {
+		//	log.Print(info)
+		//}
 
 		e := &sender.Edward{
 			Contents:     contents,

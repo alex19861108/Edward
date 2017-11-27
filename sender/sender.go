@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"git-pd.megvii-inc.com/liuwei02/Edward/taurusrpc"
 	"log"
+	"math"
 	"sync"
 	"time"
 )
@@ -63,10 +64,20 @@ func (e *Edward) runWorkers() {
 
 func (e *Edward) runWorker(n int, qps float64) {
 	var throttle <-chan time.Time
-	throttle = time.Tick(time.Duration(1e6/(qps)) * time.Microsecond)
+	if !math.IsInf(qps, 0) {
+		throttle = time.Tick(time.Duration(1e6/(qps)) * time.Microsecond)
+	}
+
+	//defer func() {
+	//	if err := recover(); err != nil {
+	//		log.Print("run time panic: ", err)
+	//	}
+	//}()
 
 	for i := 0; i < n; i++ {
-		<-throttle
+		if !math.IsInf(qps, 0) {
+			<-throttle
+		}
 		content := e.getRequestBody(i)
 		value, ok := content.(string)
 		if !ok {
@@ -79,7 +90,13 @@ func (e *Edward) runWorker(n int, qps float64) {
 			continue
 		}
 		resStart := time.Now()
-		resp := taurusrpc.CSearchXID(e.Address, &info)
+		resp, err := taurusrpc.CSearchXID(e.Address, &info)
+		if err != nil {
+			continue
+			//panic(err)
+		}
+		log.Printf("%v", info)
+		log.Printf("%v", resp)
 		t := time.Now()
 		duration := t.Sub(resStart)
 		response, _ := json.Marshal(resp)

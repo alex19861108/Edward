@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func CSearchXID(address string, info *SearchXIDInfo) *SearchXIDRes {
+func CSearchXID(address string, info *SearchXIDInfo) (*SearchXIDRes, error) {
 	// Set up a connection to the server
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -18,7 +18,8 @@ func CSearchXID(address string, info *SearchXIDInfo) *SearchXIDRes {
 	// Run API SearchXID
 	r, err := c.SearchXID(context.Background(), info)
 	if err != nil {
-		log.Fatalf("Client error when run API SearchXID: %v", err)
+		//log.Fatalf("Client error when run API SearchXID: %v", err)
+		log.Printf("Client error when run API SearchXID: %v", err)
 	}
-	return r
+	return r, err
 }

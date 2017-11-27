@@ -3,7 +3,12 @@ package sender
 import (
 	"log"
 	"sort"
+	"strings"
 	"time"
+)
+
+const (
+	barChar = "∎"
 )
 
 type report struct {
@@ -54,5 +59,61 @@ func (r *report) print() {
 		log.Printf("  Fastest:\t%4.4f secs\n", r.fastest)
 		log.Printf("  Average:\t%4.4f secs\n", r.average)
 		log.Printf("  Requests/sec:\t%4.4f\n", r.rps)
+
+		r.printHistogram()
+		r.printLatencies()
+	}
+}
+
+func (r *report) printHistogram() {
+	bc := 10
+	buckets := make([]float64, bc+1)
+	counts := make([]int, bc+1)
+	bs := (r.slowest - r.fastest) / float64(bc)
+	for i := 0; i < bc; i++ {
+		buckets[i] = r.fastest + bs*float64(i)
+	}
+	buckets[bc] = r.slowest
+	var bi int
+	var max int
+	for i := 0; i < len(r.lats); {
+		if r.lats[i] <= buckets[bi] {
+			i++
+			counts[bi]++
+			if max < counts[bi] {
+				max = counts[bi]
+			}
+		} else if bi < len(buckets)-1 {
+			bi++
+		}
+	}
+	log.Printf("\nResponse time histogram:\n")
+	for i := 0; i < len(buckets); i++ {
+		// Normalize bar lengths.
+		var barLen int
+		if max > 0 {
+			barLen = (counts[i]*40 + max/2) / max
+		}
+		log.Printf("  %4.3f [%v]\t|%v\n", buckets[i], counts[i], strings.Repeat(barChar, barLen))
+	}
+}
+
+// printLatencies prints percentile latencies.
+func (r *report) printLatencies() {
+	pctls := []int{10, 25, 50, 75, 90, 95, 99}
+	data := make([]float64, len(pctls))
+	j := 0
+	for i := 0; i < len(r.lats) && j < len(pctls); i++ {
+		current := i * 100 / len(r.lats)
+		if current >= pctls[j] {
+			data[j] = r.lats[i]
+			j++
+		}
+	}
+	log.Printf("\nLatency distribution:\n")
+	for i := 0; i < len(pctls); i++ {
+		if data[i] > 0 {
+			log.Printf("  %v%% in %4.4f secs\n", pctls[i], data[i])
+		}
 	}
 }

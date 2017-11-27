@@ -49,3 +49,13 @@ func TestTransform(t *testing.T) {
 		fmt.Printf("%d %s %s = %v\n", i, typeOfT.Field(i).Name, f.Type(), f.Interface())
 	}
 }
+
+func TestReflect(t *testing.T) {
+	var x int = 1
+	fmt.Println("type: ", reflect.TypeOf(x))
+	fmt.Println("value: ", reflect.ValueOf(x))
+	fmt.Println("Kind:  ", reflect.ValueOf(x).Kind())
+
+	y := reflect.ValueOf(x).Interface()
+	fmt.Println(y)
+}
